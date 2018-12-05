@@ -19,34 +19,8 @@
 ![image](https://raw.githubusercontent.com/2bcoin/zheshiyigeniubidexiangmu/master/simg/3.png)
 ![image](https://raw.githubusercontent.com/2bcoin/zheshiyigeniubidexiangmu/master/simg/4.png)
 
-### 开发者建议
-- 表名，建议使用小写，多个单词使用下划线拼接
-- entity内成员变量建议与表字段数量对应
-- 前端统一使用`Content-Type=application/json`传参;`controller`层统一使用`@RequestBody`入参,参数可以使用Map接收,也可考虑封装成VO对象(推荐)
-- 需要工具类的话建议先从`common/utils`中找，实在没有再造轮子或引入类库，尽量精简项目
-- 开发规范建议遵循阿里巴巴Java开发手册（[最新版下载](https://github.com/lihengming/java-codes/blob/master/shared-resources/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4Java%E5%BC%80%E5%8F%91%E6%89%8B%E5%86%8CV1.2.0.pdf))
-- 建议在公司内部使用ShowDoc、Swagger2 、RAP等开源项目来编写、管理API文档
-- 页面常量信息建议放在`constants`表;如民族/地址/证件类型/性别等;
-- 所有项目文档放置在`/resources/archives`目录下
-- 建议所有DTO/BO放在相应service目录下;VO放在相应controller目录下
-- 修改已有表结构时,不建议修改以下字段(id,enabled,deleted);因为这些字段已在开发中用到
-- 增删改方法命名分别以`insert/delete/update`打头
+### 项目说明
+- 待添加
 
-
-### 相关环境(推荐使用环境)
-- OS Microsoft Windows 10 Pro
-- Editor IntelliJ IDEA
-- Java 8
-- SpringMVC 4.3
-- Mybitis 3.4
-- Mysql 5.5.50
-- Maven 3.5.3
-- Git 2.14.1
-- Tomcat 7.0.85
-- Swagger 2.6.1
-- Restful interface
-
-
-### 注意事项
-- 使用mybaitis-generator插件生成dao层时请先删除原来的文件,不然生的的内容会追加到源文件中,出现代码重复
-- 下载后如打不开swagger2文档，可能需要修改`webapp/common-core-swagger-ui/config.js`文件中得地址
+### 交流
+- 待添加
