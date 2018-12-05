@@ -1,0 +1,61 @@
+{
+  "data": [
+    {
+      "text": "策略控制",
+      "icon": "&#xe620;",
+      "subset": [
+        {
+          "text": "三角",
+          "icon": "&#xe621;",
+          "href": "page/sanjiao.html"
+        },
+        {
+          "text": "期现图",
+          "icon": "&#xe621;",
+          "href": "page/qixiantu.html"
+        }
+      ]
+    }, {
+      "text": "平台管理",
+      "icon": "&#xe620;",
+      "subset": [
+        {
+          "text": "策略配置",
+          "icon": "&#xe621;",
+          "href": "page/scriptData.html"
+        },
+        {
+          "text": "托管者配置",
+          "icon": "&#xe621;",
+          "href": "page/ipAndScript.html"
+        },
+        {
+          "text": "平台配置",
+          "icon": "&#xe621;",
+          "href": "page/fmzconfigs.html"
+        }
+      ]
+    },{
+      "text": "扩展",
+      "icon": "&#xe628;",
+      "href": "",
+      "subset": [
+        {
+          "text": "实时价格",
+          "icon": "&#xe621;",
+          "href": "page/shishijiage.html"
+        },
+        {
+          "text": "账户情况",
+          "icon": "&#xe621;",
+          "href": "page/accountInfo.html"
+        },
+        {
+          "text": "策略配置",
+          "icon": "&#xe621;",
+          "href": "page/scriptData.html"
+        }
+      ]
+    }
+  ]
+}

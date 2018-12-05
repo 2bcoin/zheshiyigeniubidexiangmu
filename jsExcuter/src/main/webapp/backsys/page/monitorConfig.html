@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>监控配置</title>
+    <link rel="stylesheet" href="../frame/layui/css/layui.css">
+    <link rel="stylesheet" href="../frame/static/css/style.css">
+    <link rel="icon" href="../frame/static/image/code.png">
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery.serializeJSON/2.9.0/jquery.serializejson.min.js"></script>
+    <script src="../frame/layui/layui.js"></script>
+    <script src="../frame/Mtils.js"></script>
+</head>
+<body class="body">
+<div class="layui-tab layui-tab-brief">
+    <ul class="layui-tab-title">
+        <li class="layui-this">行情监控</li>
+    </ul>
+    <div class="layui-tab-content">
+        <div class="layui-tab-item layui-show">
+            <button class="layui-btn" onclick="addOrUpdateUser()">添加联系人</button>
+            <button class="layui-btn" onclick="addOrUpdateMonitorConfig()">添加监控配置</button>
+        </div>
+        <table class="layui-table">
+            <colgroup>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col width="200">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>姓名</th>
+                <th>联系电话</th>
+                <th>创建时间</th>
+                <th>修改时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="userList">
+            </tbody>
+        </table>
+
+        <div id="monitorConfigList"></div>
+
+        <!--新增或更新用户-->
+        <div id="userDetail" style="display: none">
+            <form class="layui-form">
+                <div>
+                    <input id="userId" name="id" hidden>
+                </div>
+                <div class="layui-form-item" style="margin-top: 15px">
+                    <label class="layui-form-label">用户名称</label>
+                    <div class="layui-input-block">
+                        <input id="username" type="text" name="username" lay-verify="required|username" placeholder="请输入用户名称" class="layui-input" style="width: 90%">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">手机号码</label>
+                    <div class="layui-input-block">
+                        <input id="phone" type="text" name="phone" lay-verify="required|phone|number" placeholder="请输入手机号码" class="layui-input" style="width: 90%">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="submitUserDetail">立即提交</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!--新增监控配置-->
+        <div id="monitorConfig" style="display: none">
+            <form class="layui-form">
+                <div class="layui-form-item" style="margin-top: 15px">
+                    <label class="layui-form-label" style="width: 350px">币种</label>
+                    <div class="layui-input-inline" style="width: 350px">
+                        <div class="layui-input-block">
+                            <select name="coinOtc">
+                                <option value="btc">btc</option>
+                                <option value="ltc">ltc</option>
+                                <option value="eth">eth</option>
+                                <option value="etc">etc</option>
+                                <option value="bch">bch</option>
+                                <option value="eos" selected="">eos</option>
+                                <option value="xrp">xrp</option>
+                                <option value="xbt">xbt</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="width: 350px">合约类型</label>
+                    <div class="layui-input-inline" style="width: 350px">
+                        <div class="layui-input-block">
+                            <input name="contractType" value="quarter" lay-verify="required" type="text" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="width: 350px">周期</label>
+                    <div class="layui-input-inline" style="width: 350px">
+                        <div class="layui-input-block">
+                            <select name="cycle" >
+                                <option value="1min">1min</option>
+                                <option value="5min">5min</option>
+                                <option value="15min">15min</option>
+                                <option value="30min">30min</option>
+                                <option value="1hour">1hour</option>
+                                <option value="2hour">2hour</option>
+                                <option value="4hour">4hour</option>
+                                <option value="6hour">6hour</option>
+                                <option value="12hour">12hour</option>
+                                <option value="day">day</option>
+                                <option value="3day">3day</option>
+                                <option value="week">week</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="width: 350px">时长</label>
+                    <div class="layui-input-inline" style="width: 350px">
+                        <div class="layui-input-block">
+                            <input id="configSize" name="size" lay-verify="required" type="text" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="width: 350px">价格波动阀值 (最高价-最低价)/当前价</label>
+                    <div class="layui-input-inline" style="width: 350px">
+                        <div class="layui-input-block">
+                            <input id="priceSurgeThreshold" name="priceSurgeThreshold" lay-verify="required" type="text" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="width: 350px">最大交易量比率 最大交易量/分钟平均交易量</label>
+                    <div class="layui-input-inline" style="width: 350px">
+                        <div class="layui-input-block">
+                            <input id="maxVolumeRateThreshold" name="maxVolumeRateThreshold" lay-verify="required" type="text" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="width: 350px">第二大交易量变化率 分钟最大交易量/分钟第二大交易量</label>
+                    <div class="layui-input-inline" style="width: 350px">
+                        <div class="layui-input-block">
+                            <input id="maxSecondVolumeVaryThreshold" name="maxSecondVolumeVaryThreshold" lay-verify="required" type="text" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block" style="text-align: right; margin-right: 110px">
+                        <button class="layui-btn" lay-submit lay-filter="submitMonitorConfig">立即提交</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script id="userListTpl" type="text/html">
+    {{#  layui.each(d, function(index, item){ }}
+    <tr>
+        <td>{{item.username}}</td>
+        <td>{{item.phone}}</td>
+        <td>{{Mtils.extention.formatDate(item.createTime, "yyyy-MM-dd hh:mm:ss")}}</td>
+        <td>{{Mtils.extention.formatDate(item.updateTime, "yyyy-MM-dd hh:mm:ss")}}</td>
+        <td>
+            <button onclick="addOrUpdateUser(this, '{{item.id}}')" class="layui-btn layui-btn-xs">修改</button>
+            <button onclick="deleteUser('{{item.id}}')" class="layui-btn layui-btn-danger">删除</button>
+        </td>
+    </tr>
+    {{#  }); }}
+</script>
+<script id="monitorConfigListTpl" type="text/html">
+    {{#  layui.each(d.list, function(index, item){ }}
+    <div class="layui-inline" style="width: 825px">
+        <fieldset class="layui-elem-field">
+            <legend>{{item.coinOtc.toUpperCase()}}</legend>
+            <div class="layui-field-box">
+                <form class="layui-form" id="config_{{item.id}}">
+                    <div>
+                        <input name="id" value="{{item.id}}" hidden>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" style="width: 350px">合约类型</label>
+                        <div class="layui-input-block">
+                            <input type="text" class="layui-input" lay-verify="required" style="width: 50%" name="contractType" value="{{item.contractType}}">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" style="width: 350px">周期</label>
+                        <div class="layui-input-inline" style="width: 328px">
+                            <!--<input type="text" class="layui-input" style="width: 50%" name="cycle" value="{{item.cycle}}">-->
+                            <select name="cycle">
+                                {{# for(var i=0; i < d.cycles.length; i++) { }}
+                                {{# if(d.cycles[i] == item.cycle ) { }}
+                                <option value="{{d.cycles[i]}}" selected>{{d.cycles[i]}}</option>
+                                {{# }else{ }}
+                                <option value="{{d.cycles[i]}}">{{d.cycles[i]}}</option>
+                                {{# }; }}
+                                {{# }; }}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" style="width: 350px">时长</label>
+                        <div class="layui-input-block">
+                            <input type="text" class="layui-input" lay-verify="required" style="width: 50%" name="size" value="{{item.size}}">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" style="width: 350px">价格波动阀值 (最高价-最低价)/当前价</label>
+                        <div class="layui-input-block">
+                            <input type="text" class="layui-input" lay-verify="required" style="width: 50%" name="priceSurgeThreshold" value="{{item.priceSurgeThreshold}}">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" style="width: 350px">最大交易量比率 最大交易量/分钟平均交易量</label>
+                        <div class="layui-input-block">
+                            <input type="text" class="layui-input" lay-verify="required" style="width: 50%" name="maxVolumeRateThreshold" value="{{item.maxVolumeRateThreshold}}">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" style="width: 350px">第二大交易量变化率 分钟最大交易量/分钟第二大交易量</label>
+                        <div class="layui-input-block">
+                            <input type="text" class="layui-input" lay-verify="required" style="width: 50%" name="maxSecondVolumeVaryThreshold" value="{{item.maxSecondVolumeVaryThreshold}}">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block" style="text-align: right; margin-right: 110px">
+                            <input type="button" class="layui-btn layui-btn-danger" value="删除" onclick="deleteMonitorConfig('{{item.id}}')">
+                            <!--<input type="button" class="layui-btn" value="保存" onclick="submitMonitorConfig()">-->
+                            <button class="layui-btn" lay-submit lay-filter="submitMonitorConfig">保存</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+    </div>
+    {{#  }); }}
+</script>
+<script>
+    var addOrUpdateUserPop;
+    var addOrUpdateMonitorConfigPop;
+    //注意：选项卡 依赖 element 模块，否则无法进行功能性操作
+    layui.use(['element', 'table', 'form', 'layer', 'laytpl'], function () {
+        var element = layui.element
+            , table = layui.table
+            , form = layui.form
+            , layer = layui.layer
+            , laytpl = layui.laytpl;
+        form.verify({
+            username: function(value, item){ //value：表单的值、item：表单的DOM对象
+                if(!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)){
+                    return '用户名不能有特殊字符';
+                }
+                if(/(^\_)|(\__)|(\_+$)/.test(value)){
+                    return '用户名首尾不能出现下划线\'_\'';
+                }
+                if(/^\d+\d+\d$/.test(value)){
+                    return '用户名不能全为数字';
+                }
+            }
+
+            //我们既支持上述函数式的方式，也支持下述数组的形式
+            //数组的两个值分别代表：[正则匹配、匹配不符时的提示文字]
+            ,password: [
+                /^[\S]{6,12}$/
+                ,'密码必须6到12位，且不能出现空格'
+            ]
+        });
+        form.on('submit(submitUserDetail)', function(data){
+            submitUserDetail();
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+        form.on('submit(submitMonitorConfig)', function(data){
+            submitMonitorConfig(data.field.id);
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+        //…
+    });
+    $(function () {
+        getUserList();
+        getMonitorConfigList();
+    });
+
+    function addOrUpdateUser(e, id) {
+        var username = '';
+        var phone = '';
+        if (!id) {
+            addOrUpdateUserPop = layer.open({
+                type: 1,
+                title: '添加联系人',
+                content: $('#userDetail'),
+                area: '400px'
+            });
+        } else {
+            username = e.parentNode.parentNode.children[0].innerHTML;
+            phone = e.parentNode.parentNode.children[1].innerHTML;
+            addOrUpdateUserPop = layer.open({
+                type: 1,
+                title: '修改联系人',
+                content: $('#userDetail'),
+                area: '400px'
+            });
+        }
+        document.getElementById('userId').value = id;
+        document.getElementById('username').value = username;
+        document.getElementById('phone').value = phone;
+    }
+
+    function addOrUpdateMonitorConfig(e, id) {
+        document.getElementById('configSize').value = '';
+        document.getElementById('priceSurgeThreshold').value = '';
+        document.getElementById('maxVolumeRateThreshold').value = '';
+        document.getElementById('maxSecondVolumeVaryThreshold').value = '';
+        if (!id) {
+            addOrUpdateMonitorConfigPop = layer.open({
+                type: 1,
+                title: '添加监控配置',
+                content: $('#monitorConfig'),
+                area: '800px'
+            });
+        }
+    }
+
+    function submitUserDetail() {
+        $.ajax({
+            type: "POST",
+            url: location.origin + "/common-core/v1/monitorConfig/addOrUpdateUser",
+            contentType: "application/json; charset=utf-8",
+            headers: {
+                "Authorization": localStorage.session
+            },
+            data: JSON.stringify($('#userDetail').find('form').serializeJSON()),
+            dataType: "json",
+            success: function (message) {
+                if (0 === message.code) {
+                    layer.close(addOrUpdateUserPop);
+                    getUserList();
+                } else {
+                    layer.open({content: message.msg})
+                }
+            }
+        });
+    }
+
+    function submitMonitorConfig(id) {
+        var $from;
+        if (id) {
+            $from = $('#config_' + id);
+        } else {
+            $from = $('#monitorConfig').find('form');
+        }
+        $.ajax({
+            type: "POST",
+            url: location.origin + "/common-core/v1/monitorConfig/addOrUpdateMonitorConfig",
+            contentType: "application/json; charset=utf-8",
+            headers: {
+                "Authorization": localStorage.session
+            },
+            data: JSON.stringify($from.serializeJSON()),
+            dataType: "json",
+            success: function (message) {
+                if (0 === message.code) {
+                    layer.close(addOrUpdateMonitorConfigPop);
+                    getMonitorConfigList();
+                } else {
+                    layer.open({content: message.msg})
+                }
+            }
+        });
+    }
+
+    function deleteUser(id) {
+        $.ajax({
+            type: "POST",
+            url: location.origin + "/common-core/v1/monitorConfig/deleteUserInfo",
+            headers: {
+                "Authorization": localStorage.session
+            },
+            data: {"id": id},
+            dataType: "json",
+            success: function (message) {
+                if (0 === message.code) {
+                    getUserList();
+                } else {
+                    layer.open({content: message.msg})
+                }
+            }
+        });
+    }
+
+    function deleteMonitorConfig(id) {
+        $.ajax({
+            type: "POST",
+            url: location.origin + "/common-core/v1/monitorConfig/deleteMonitorConfig",
+            headers: {
+                "Authorization": localStorage.session
+            },
+            data: {"id": id},
+            dataType: "json",
+            success: function (message) {
+                if (0 === message.code) {
+                    getMonitorConfigList();
+                } else {
+                    layer.open({content: message.msg})
+                }
+            }
+        });
+    }
+
+    function getUserList() {
+        $.ajax({
+            type: "GET",
+            url: window.location.origin + "/common-core/v1/monitorConfig/listUser",
+            headers: {
+                "Authorization": localStorage.session
+            },
+            success: function (res) {
+                if (res.success && res.data) {
+                    layui.laytpl(userListTpl.innerHTML).render(res.data, function (html) {
+                        document.getElementById('userList').innerHTML = html;
+                    });
+                }
+            }
+        });
+    }
+
+    function getMonitorConfigList() {
+        $.ajax({
+            type: "GET",
+            url: window.location.origin + "/common-core/v1/monitorConfig/listMonitorConfig",
+            headers: {
+                "Authorization": localStorage.session
+            },
+            success: function (res) {
+                if (res.success && res.data) {
+                    var data = {};
+                    var arr = ['1min', '5min', '15min', '30min', '1hour', '2hour', '4hour', '6hour', '12hour', 'day', '3day', 'week'];
+                    data.cycles = arr;
+                    data.list = res.data;
+                    layui.laytpl(monitorConfigListTpl.innerHTML).render(data, function (html) {
+                        document.getElementById('monitorConfigList').innerHTML = html;
+                        layui.form.render();
+                    });
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

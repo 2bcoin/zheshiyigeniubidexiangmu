@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+                         http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context-4.3.xsd
+                        http://www.springframework.org/schema/mvc
+                        http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+    <!--启用spring的一些annotation -->
+    <context:annotation-config/>
+
+
+    <!-- 配置使Spring采用CGLIB代理 -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+    <!-- 自动扫描该包，使SpringMVC认为包下用了@controller注解的类是控制器 -->
+    <context:component-scan base-package="com.github.misterchangray.controller">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!--扫描service-->
+    <context:component-scan base-package="com.github.misterchangray.service"/>
+
+    <!--HandlerMapping 无需配置，SpringMVC可以默认启动-->
+
+    <!--静态资源映射-->
+    <!--本项目把静态资源放在了WEB-INF的子目录下，资源映射如下-->
+    <mvc:resources mapping="/css/**" location="/css/"/>
+    <mvc:resources mapping="/js/**" location="/js/"/>
+    <mvc:resources mapping="/image/**" location="/image/"/>
+
+    <!-- 跨域请求配置 允许任何跨域访问后台地址 -->
+    <mvc:cors>
+        <mvc:mapping path="/**/**"
+                     allowed-origins="*"
+                     allowed-methods="GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH"
+                     allowed-headers="Content-Type, Authorization, Access-Control-Allow-Origin, Access-Control-Allow-Headers, X-Requested-With, Authentication"
+                     allow-credentials="true"
+                     max-age="180" />
+    </mvc:cors>
+
+    <!-- 映射docs路径到swagger-ui中 -->
+    <mvc:resources mapping="/docs/**" location="/common-core-swagger-ui/" />
+    <!-- 映射docs路径到swagger-ui中 -->
+    <mvc:resources mapping="/kline/**" location="/kline/" />
+    <!-- 映射docs路径到swagger-ui中 -->
+    <mvc:resources mapping="/freedom/**" location="/freedom/" />
+    <!-- 映射docs路径到swagger-ui中 -->
+    <mvc:resources mapping="/backsys/**" location="/backsys/" />
+
+   <!-- 配置注解驱动 可以将request参数与绑定到controller参数上 -->
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>application/json;charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <!-- 对模型视图名称的解析，即在模型视图名称添加前后缀(如果最后一个还是表示文件夹,则最后的斜杠不要漏了) 使用JSP-->
+    <!-- 默认的视图解析器在上边的解析错误时使用 (默认使用html)- -->
+    <bean id="defaultViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <!--设置JSP文件的目录位置-->
+        <property name="prefix" value="/WEB-INF/views/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!-- SpringMVC文件上传需要配置的节点-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="20971500"/>
+        <property name="defaultEncoding" value="UTF-8"/>
+        <property name="resolveLazily" value="true"/>
+    </bean>
+
+    <mvc:interceptors>
+        <bean class="com.github.misterchangray.common.interceptor.AuthInterceptor"></bean>
+    </mvc:interceptors>
+
+</beans>

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title></title>
+    <link rel="stylesheet" href="../frame/layui/css/layui.css">
+    <link rel="stylesheet" href="../frame/static/css/style.css">
+    <link rel="icon" href="../frame/static/image/code.png">
+</head>
+<script src="../frame/Mtils.js"></script>
+<body class="body">
+<div class="layui-tab">
+    <ul class="layui-tab-title">
+        <li class="layui-this">日志</li>
+        <li>配置</li>
+    </ul>
+    <div class="layui-tab-content">
+        <!--tab页1-->
+        <div class="layui-tab-item layui-show">
+            <fieldset class="layui-elem-field site-demo-button">
+                <legend>三角策略</legend>
+                <div >三角当前状态:<span id="currentStatus"></span>;&nbsp;&nbsp;&nbsp;&nbsp;上次启动时间:<span id="startTime"></span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;成交利率:<span id="lv1"></span>&nbsp;&nbsp;&nbsp;&nbsp;日志利率:<span id="lv2"></span></div>
+                <div>
+                    <button onclick="start()" class="layui-btn">启动三角</button>
+                    <button onclick="pause()" class="layui-btn layui-btn-danger">暂停三角</button>
+                    <button id="editlvBtn" class="layui-btn layui-btn-danger">修改利率</button>
+                </div>
+            </fieldset>
+            <fieldset class="layui-elem-field site-demo-button">
+                <legend>模拟日志</legend>
+                <div>
+                    <textarea readonly id="logs" style="width: 100%;" cols="150" rows="20" ></textarea>
+                </div>
+            </fieldset>
+            <fieldset class="layui-elem-field site-demo-button">
+                <legend>交易日志</legend>
+                <div>
+                    <textarea readonly id="logs2" style="width: 100%;" cols="150" rows="15"></textarea>
+                </div>
+            </fieldset>
+        </div>
+
+        <!--tab页2-->
+        <div class="layui-tab-item">
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                <legend>正在运行的三角</legend>
+            </fieldset>
+            <button class="layui-btn" id="addTaBtn">添加交易对</button>
+            <button class="layui-btn" id="addTaBtn2">批量添加</button>
+            <button class="layui-btn" onclick="reload()"><i class="layui-icon">ဂ</i></button>
+            <span>共<span id="rcount"></span>个交易规则</span>
+            <table class="layui-table">
+                <colgroup>
+                    <col width="100">
+                    <col width="100">
+                    <col width="100">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>三角详情；平台(币种,价格精度,数量精度,最低下单数量)；成交利率</th>
+                    <th>添加时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody id="talist">
+                <tr >
+                    <td>1:Huobi(ltc_usdt 3,4);2.Huobi(btc_usdt 3,4);3.OKEX(ltc_btc 3,4)</td>
+                    <td>2017-09-12 11:23:55</td>
+                    <td> <button onclick="del()" class="layui-btn layui-btn-danger">删除</button></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div id="addTaWindow" style="display: none;width: 900px">
+    <div style="margin-top: 10px;margin-left: 20px;">
+        平台1<select style="width: 100px" name="" id="pt1"></select>
+        币种1<input style="width: 100px" type="text" id="bz1">
+        价格精度1<input style="width: 100px" type="text" id="jg1">
+        数量精度1<input style="width: 100px" type="text" id="sl1">
+        下单最低数量1<input style="width: 100px" type="text" id="zdsl1">
+    </div>
+    <div style="margin-top: 15px;margin-left: 20px;">
+        平台2<select style="width: 100px" name="" id="pt2"></select>
+        币种2<input style="width: 100px" type="text" id="bz2">
+        价格精度2<input style="width: 100px" type="text" id="jg2">
+        数量精度2<input style="width: 100px" type="text" id="sl2">
+        下单最低数量1<input style="width: 100px" type="text" id="zdsl2">
+    </div>
+    <div style="margin-top: 15px;margin-left: 20px;">
+        平台3<select style="width: 100px" name="" id="pt3"></select>
+        币种3<input style="width: 100px" type="text" id="bz3">
+        价格精度3<input style="width: 100px" type="text" id="jg3">
+        数量精度3<input style="width: 100px" type="text" id="sl3">
+        下单最低数量1<input style="width: 100px" type="text" id="zdsl3">
+    </div>
+    <div style="margin-top: 15px;margin-left: 20px;">
+        成交利率<input style="width: 100px" type="text" id="cjlv">
+    </div>
+    <div style="margin-top: 15px;margin-left: 20px;">
+        <button id="bcsj" class="layui-btn">保存</button>
+    </div>
+</div>
+
+<div id="addTaWindow2" style="display: none;width: 900px">
+    <div style="margin-top: 15px;margin-left: 20px;">
+        <div>Fcoin, HuoBi, Big1, OKEX, Bitfinex, BiAn</div>
+        <pre>
+[
+    {
+        "taConfigList":[
+                {"org":"HuoBi","coin":"eos_usdt","amountPrecision":4,"pricePrecision":4,"minAmount":0.01},
+                {"org":"Bitfinex","coin":"eth_usdt","amountPrecision":8,"pricePrecision":4,"minAmount":0.04},
+                {"org":"BiAn","coin":"eos_eth","amountPrecision":2,"pricePrecision":6,"minAmount":0.5}
+        ],
+        "lv":null
+    }
+]
+        </pre>
+    </div>
+    <div style="margin-top: 15px;margin-left: 20px;">
+        <textarea name="" id="addscript" cols="120" rows="8"></textarea>
+    </div>
+    <div style="margin-top: 15px;margin-left: 20px;">
+        <button id="bcsj2" class="layui-btn">保存</button>
+    </div>
+</div>
+
+<div id="addTaWindow3" style="display: none;width: 300px">
+    <div style="margin-top: 10px;margin-left: 20px;">
+        成交利率<input style="width: 100px" type="text" id="cj_lv">
+    </div>
+    <div style="margin-top: 10px;margin-left: 20px;">
+        日志利率<input style="width: 100px" type="text" id="rz_lv">
+    </div>
+    <div style="margin-top: 15px;margin-left: 20px;">
+        <button id="bcsj3" class="layui-btn">保存</button>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="../frame/layui/layui.js"></script>
+</body>
+<script type="text/javascript">
+    // you code ...
+
+    layui.use(['element','layer'], function () {
+        var $ = layui.jquery
+            , element = layui.element;
+
+        window.$ = layui.jquery;
+        $('.site-demo-active').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //保存 利率修改
+        $("#bcsj3").on("click", function() {
+            var lv1 = window.cj_lv.value;
+            var lv2 = window.rz_lv.value;
+            if(lv1 && lv2) {
+                if(Mtils.validation.isNumber(lv1) && Mtils.validation.isNumber(lv2)) {
+                    layer.confirm('确认？', {
+                        btn: ['确认','取消'] //按钮
+                    }, function(){
+                        var param = {
+                            fv:lv1,
+                            fv2:lv2
+                        };
+                        $.ajax({
+                            type: "POST",
+                            url: location.origin + "/common-core/v1/ta/editFv",
+                            headers: {
+                                "Authorization": localStorage.session
+                            },
+                            contentType: "application/json; charset=utf-8",
+                            async:false,
+                            data: JSON.stringify(param),
+                            dataType: "json",
+                            success: function (message) {
+                                if(message && message.success) {
+                                    layer.open({content:"操作成功;"})
+                                    getTaInfo();
+                                }
+                            }
+                        });
+                    });
+                }
+            }
+        })
+
+        //保存 批量增加三角
+        $("#bcsj2").on("click", function() {
+            var tmp = window.addscript.value;
+            if(tmp && tmp.length > 6) {
+                tmp = JSON.parse(tmp);
+                if(Array.isArray(tmp))
+                    var result = [];
+                    for(var i in tmp) {
+                        var obj = tmp[i];
+                       if(obj && obj.taConfigList && obj.taConfigList.length == 3)
+                           $.ajax({
+                               type: "POST",
+                               url: location.origin + "/common-core/v1/ta/addTAConfigs",
+                               contentType: "application/json; charset=utf-8",
+                               headers: {
+                                   "Authorization": localStorage.session
+                               },
+                               async:false,
+                               data: JSON.stringify(obj),
+                               dataType: "json",
+                               success: function (message) {
+                                   if(message && message.success) {
+                                       result.push(1);
+                                   }
+                               }
+                           });
+                    }
+
+                    if(result.length == tmp.length) {
+                        layer.open({content:"添加成功"})
+                    } else {
+                        layer.open({content:"部分添加失败;下次添加前请删除已成功数据"})
+                    }
+                }
+        })
+        //保存 三角
+        $("#bcsj").on("click", function() {
+            var json = {
+                lv:window.cjlv.value,
+                taConfigList : []
+            };
+            json.taConfigList.push({
+                org:window.pt1.value,
+                coin:window.bz1.value,
+                pricePrecision:window.jg1.value,
+                amountPrecision:window.sl1.value,
+                minAmount:window.zdsl1.value
+
+            })
+            json.taConfigList.push({
+                org:window.pt2.value,
+                coin:window.bz2.value,
+                pricePrecision:window.jg2.value,
+                amountPrecision:window.sl2.value,
+                minAmount:window.zdsl2.value
+            })
+            json.taConfigList.push({
+                org:window.pt3.value,
+                coin:window.bz3.value,
+                pricePrecision:window.jg3.value,
+                amountPrecision:window.sl3.value,
+                minAmount:window.zdsl3.value
+            })
+
+            var validateCoin = ["btc","usdt", "bch", "eth", "etc", "ltc", "eos", "omg", "dash", "zec"];
+            var checkCoin = function(name) {
+                if(name) {
+                    if(2 == name.split("_").length) {
+                        if(-1 != validateCoin.indexOf(name.split("_")[0]) && -1 != validateCoin.indexOf(name.split("_")[1])) {
+                            if(name.split("_")[0] !=  name.split("_")[1]) {
+                                return true;
+                            } else {
+                                layer.open({content:"币种信息填写错误"})
+                            }
+                        } else {
+                            layer.open({content:"币种只能为以下几种:" + JSON.stringify(validateCoin)})
+                        }
+                    } else {
+                        layer.open({content:"交易对之间下划线隔开如(btc_usdt)"})
+                    }
+                } else {
+                    layer.open({content:"交易对填写错误"})
+                }
+                return false;
+            }
+            var isNumber = function (str_data) {
+                str_data = str_data || String(this);
+                var reg =  /^[0-9]+(\.[0-9]+)?$/;
+                return reg.test(str_data);
+            }
+
+            var uniqueArray = function(arr) {
+                var _this = arr || this;
+                if(undefined === _this || null === _this || 0 === _this.length) return [];
+                _this.sort();
+                var re=[_this[0]];
+                for(var i = 1; i < _this.length; i++) {
+                    if( _this[i] !== re[re.length-1]) {
+                        re.push(_this[i]);
+                    }
+                }
+                return re;
+            }
+
+            var flag = true;
+            var names = [];
+            for(var i in json.taConfigList) {
+                var tmp = json.taConfigList[i];
+                if(!checkCoin(tmp.coin)) {
+                    flag = false;
+                    break;
+                }
+                names.push(tmp.coin.split("_")[0]);
+                names.push(tmp.coin.split("_")[1]);
+                if(!isNumber(tmp.pricePrecision)) {
+                    layer.open({content:"价格应该为数字"})
+                    flag = false;
+                    break;
+                }
+                if(!isNumber(tmp.amountPrecision)) {
+                    layer.open({content:"数量应该为数字"})
+                    flag = false;
+                    break;
+                }
+                if(!isNumber(tmp.minAmount)) {
+                    layer.open({content:"最小成交量应该为数字"})
+                    flag = false;
+                    break;
+                }
+            }
+            if(flag && json.lv) {
+                if(!isNumber(json.lv)) {
+                    flag = false;
+                    layer.open({content:"利率应该为数字"})
+
+                }
+            }
+            if(flag && 3 != uniqueArray(names).length) {
+                layer.open({content:"配置的币种不能构成三角"})
+                flag = false;
+            }
+            if(flag) {
+                var tmp6 = json.taConfigList[0].coin.split("_")[0] + "_" + json.taConfigList[1].coin.split("_")[0]
+                if(tmp6 !=json.taConfigList[2].coin ) {
+                    layer.open({content:"配置币种顺序不正确;例如btc_usdt,eth_usdt,eth_btc;顺序应该为;eth_usdt,btc_usdt,eth_btc"})
+                    flag = false;
+                }
+            }
+            if(false == flag) return;
+            $.ajax({
+                type: "POST",
+                url: location.origin + "/common-core/v1/ta/addTAConfigs",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "Authorization": localStorage.session
+                },
+                data: JSON.stringify(json),
+                dataType: "json",
+                success: function (message) {
+                    layer.open({content:`操作成功;成功加入:${JSON.stringify(message.data)}`})
+                    reload();
+                }
+            });
+        });
+        // you code ...
+        $("#addTaBtn").on("click", function() {
+            layer.open({
+                type: 1,
+                content: $('#addTaWindow'), //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+                area: ['900px', '280px']
+            });
+
+            var jys = ["Fcoin", "HuoBi", "Big1", "OKEX", "Bitfinex", "BiAn"];
+            var selectHtml = "";
+            jys.forEach(function(item) {
+                selectHtml += `<option value="${item}">${item}</option>`;
+            })
+            window.pt1.innerHTML = selectHtml;
+            window.pt2.innerHTML = selectHtml;
+            window.pt3.innerHTML = selectHtml;
+        })
+
+        $("#addTaBtn2").on("click", function() {
+            layer.open({
+                type: 1,
+                content: $('#addTaWindow2'), //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+                area: ['900px', '380px']
+            });
+        })
+
+        $("#editlvBtn").on("click", function() {
+            layer.open({
+                type: 1,
+                content: $('#addTaWindow3'), //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+                area: ['300px', '280px']
+            });
+        })
+
+    });
+
+    function  del(id) {
+        if(id) {
+            layer.confirm('确认删除？', {
+                btn: ['确认','取消'] //按钮
+            }, function(){
+                $.ajax({
+                    type: "GET",
+                    url: window.location.origin + "/common-core/v1/ta/delTAConfigs?id=" + id ,
+                    headers: {
+                        "Authorization": localStorage.session
+                    },
+                    success: function (res) {
+                        if(0 == res.code) {
+                            layer.open({content:"操作成功;"})
+                            reload();
+                        }
+                    }
+                });
+            });
+        }
+
+    }
+    function reload() {
+        $.ajax({
+            type: "GET",
+            url: window.location.origin + "/common-core/v1/ta/listTAConfigs",
+            headers: {
+                "Authorization": localStorage.session
+            },
+            success: function (res) {
+                if(res.success && res.data) {
+                    res.data.reverse();
+                    // <tr><td>1:Huobi(ltc_usdt 3,4);2.Huobi(btc_usdt 3,4);3.OKEX(ltc_btc 3,4)</td><td> <button onclick="del()" class="layui-btn layui-btn-danger">删除</button></td></tr>
+                    var html = "";
+                    window.rcount.innerHTML =  res.data.length;
+                    res.data.forEach(function(line) {
+                        var row = line.taConfigList;
+                        var id = line.id;
+                        var org1 = `1:${row[0].org}(${row[0].coin},${row[0].pricePrecision},${row[0].amountPrecision},${row[0].minAmount});`;
+                        var org2 = `2:${row[1].org}(${row[1].coin},${row[1].pricePrecision},${row[1].amountPrecision},${row[1].minAmount});`;
+                        var org3 = `3.${row[2].org}(${row[2].coin},${row[2].pricePrecision},${row[2].amountPrecision},${row[2].minAmount})`;
+                        var content = `<tr><td>${org1 + org2 + org3};${line.lv}</td><td>${Mtils.extention.formatDate(line.insertDate, "yyyy-MM-dd hh:mm:ss")}</td><td> <button onclick="del('${line.id}')" class="layui-btn layui-btn-danger">删除</button></td></tr>`;
+                        html += content;
+                    })
+                    window.talist.innerHTML = html;
+                }
+            }
+        });
+    }
+
+    //获取所有交易对
+    function getTaInfo() {
+        $.ajax({
+            type: "GET",
+            url: location.origin + "/common-core/v1/ta/status",
+            headers: {
+                "Authorization": localStorage.session
+            },
+            success: function (res) {
+                if(false == res.success && res.code == 101002) {
+                    window.parent.location = location.origin + "/common-core/backsys/login.html";
+                    return;
+                }
+                window.currentStatus.innerHTML = res.data.status == true ? "运行中" : "已停止";
+                window.lv1.innerHTML = res.data.lv1;
+                window.lv2.innerHTML = res.data.lv2;
+                if(res.data.startTime) {
+                    window.startTime.innerHTML = formatDate(res.data.startTime, "yyyy-MM-dd hh:mm:ss");
+                } else {
+                    window.startTime.innerHTML = "未启动";
+                }
+            }
+        });
+    }
+
+    function openSocket() {
+        if(!localStorage.session) return;
+        var ws = new WebSocket("ws://" + location.host + "/common-core/v1/ws");
+        ws.onopen = function(evt) {
+            ws.send('{"subscribe":"sanjiaomoni"}'); //订阅三角模拟日志
+            ws.send('{"subscribe":"sanjiao"}'); //订阅三角交易日志
+        };
+
+        ws.onmessage = function(evt) {
+            if(evt && evt.data) {
+                var data = JSON.parse(evt.data);
+                if(0 == data.code) {
+                    if(data.msg == "sanjiaomoni") {
+                        data = data.data;
+                        if(Array.isArray(data)) {
+                            data.forEach(function(item) {
+                                window.logs.value  =  item.date + " " + item.log +  "\r\n" +   window.logs.value ;
+                            })
+                        }
+                    }
+                    if(data.msg == "sanjiao") {
+                        data = data.data;
+                        if(Array.isArray(data)) {
+                            data.forEach(function(item) {
+                                window.logs2.value  =  item.date + " " + item.log +  "\r\n" +   window.logs2.value ;
+                            })
+                        }
+                    }
+
+
+                }
+
+            }
+
+        };
+        ws.onclose = function(evt) {
+            console.log("Connection closed.");
+            openSocket();
+        };
+    }
+
+    setTimeout(function() {
+        openSocket();
+    }, 5000);
+
+    setInterval(function() {
+        if(!localStorage.session) return;
+        getTaInfo();
+
+    }, 3000)
+
+    function start() {
+        window.parent.layer.confirm('确认,启动后会清除日志？', {
+            btn: ['确认','取消'] //按钮
+        }, function(){
+            $.ajax({
+                type: "GET",
+                url: location.origin + "/common-core/v1/ta/start",
+                headers: {
+                    "Authorization": localStorage.session
+                },
+                success: function (res) {
+                    if(res.data == true) {
+                        window.parent.layer.alert('启动成功')
+                        window.logs.value = "";
+                    } else {
+                        window.parent.layer.alert('启动失败')
+                    }
+                }
+            });
+        });
+
+    }
+
+    function pause() {
+        window.parent.layer.confirm('确认？', {
+            btn: ['确认','取消'] //按钮
+        }, function(){
+            $.ajax({
+                type: "GET",
+                url: location.origin + "/common-core/v1/ta/pause",
+                headers: {
+                    "Authorization": localStorage.session
+                },
+                success: function (res) {
+                    if(res.data == false) {
+                        window.parent.layer.alert('停止成功')
+                    } else {
+                        window.parent.layer.alert('停止失败')
+                    }
+                }
+            });
+        });
+
+    }
+
+    function formatDate (timestamp, pattern) {
+        var tmp = new Date(timestamp);
+        var o = {
+            "M+": tmp.getMonth() + 1, //month
+            "d+": tmp.getDate(), //day
+            "h+": tmp.getHours(), //hour
+            "m+": tmp.getMinutes(), //minute
+            "s+": tmp.getSeconds(), //second
+            "q+": Math.floor((tmp.getMonth() + 3) / 3), //quarter
+            "S": tmp.getMilliseconds() //millisecond
+        }
+
+        if (/(y+)/.test(pattern)) {
+            pattern = pattern.replace(RegExp.$1, (tmp.getFullYear() + "").substr(4 - RegExp.$1.length));
+        }
+
+        for (var k in o) {
+            if (new RegExp("(" + k + ")").test(pattern)) {
+                pattern = pattern.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+            }
+        }
+        return pattern;
+    }
+
+</script>
+
+</html>

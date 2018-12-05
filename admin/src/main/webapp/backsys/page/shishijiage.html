@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>地图插件</title>
+    <link rel="stylesheet" href="../frame/layui/css/layui.css">
+    <link rel="stylesheet" href="../frame/static/css/style.css">
+    <link rel="icon" href="../frame/static/image/code.png">
+    <link href="../frame/bootstrap-3.3.7-dist/css/bootstrap.css" rel="stylesheet">
+</head>
+<style>
+    .name {
+        width: 100px;
+        display: inline-block;
+    }
+    .area {
+        display: inline-block;
+    }
+</style>
+<body class="body">
+
+<div class="container-fluid">
+    <div class="col-md-8">
+        <div id="echar" style="height: 600px;width: 800px">
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-12">
+                <select id="types" onchange="change()" class="form-control">
+                    <option>btc_usdt</option>
+                </select>
+
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">实时价格(价格从高到低)</div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="priceMin">y轴最小值min</label>
+                            <input type="text" class="form-control" id="priceMin" placeholder="min">
+                        </div>
+                        <!--
+                            <div class="form-group">
+                                <label for="priceMax">间隔</label>
+                                <input type="email" class="form-control" id="priceMax" placeholder="max">
+                            </div>
+                            -->
+                        <button onclick="setZoon()" type="button" class="btn btn-default">设置放大区间</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <ul>
+                            <li><span class="name">date:</span><span id="date"></span></li>
+                        </ul>
+                        <ul id="realtimePrice">
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<script type="text/javascript" src="../frame/layui/layui.js"></script>
+<script type="text/javascript" src="../frame/echarts/echarts.min.js"></script>
+<script src="../frame/Mtils.js"></script>
+<script type="text/javascript">
+
+    var maxCache = 3600; //最大缓存条数
+    var dateArr = []; //日期数组
+    var datas = {}; //所有数据缓存点
+    var option = {
+        tooltip: {
+            trigger: 'axis'
+        },
+        legend: {
+            data:[]
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        toolbox: {
+            feature: {
+                saveAsImage: {}
+            }
+        },
+        xAxis: {
+            splitLine:{show: false},//去除网格线
+            type: 'category',
+            boundaryGap: false,
+            data: dateArr
+        },
+        yAxis: {
+            splitLine:{show: false},//去除网格线
+            type: 'value'
+            // ,min:430,
+            // maxInterval: 10
+        },
+        series: [
+
+        ]
+    };
+
+    var myChart = echarts.init(document.getElementById('echar'));
+    //使用制定的配置项和数据显示图表
+    myChart.setOption(option);
+    var currentType = "btc_usdt"; //当前币种 默认为"btc_usdt"
+
+
+    function change() {
+        currentType = window.types.value;
+        option.xAxis.data.length = 0;
+        for(var key in datas) {
+            datas[key].length = 0;
+        }
+        myChart.setOption(option)
+    }
+
+    //本地最多保存3600条数据
+    function checkDatasLength() {
+        if(dateArr.length > maxCache) {
+            dateArr.shift();
+        }
+        for(var key in datas) {
+            if(datas[key].length > maxCache) {
+                datas[key].shift();
+            };
+        }
+    }
+
+    //每秒钟刷新获取一次最新价格
+    window.setInterval(function() {
+        checkDatasLength();
+
+        // okexH.send("{'event':'addChannel','parameters':{'api_key':'088cfef7-5a26-4c07-960e-15c6d1115d89','sign':'value2'}}");
+        fetch(location.origin + "/common-core/v1/ticker/lastPrice?type=" + currentType).then(function(res) {res.json().then(function(res) {
+
+            var da = Mtils.extention.formatDate(new Date().getTime(), "hh:mm:ss");
+            dateArr.push(da);
+
+            var tmp = [];
+            var legends = [];
+            for(var key in res.data) {
+                if(!datas[key]) datas[key] = [];
+                datas[key].push(res.data[key] || 0);;
+                legends.push(key);
+
+                tmp.push({
+                    name: key,
+                    price : res.data[key] || 0,
+                    symbol: "none", //去掉圆点
+                    itemStyle: {
+                        normal: {
+                            lineStyle: {
+                                width:0.8// 0.1的线条是非常细的了
+                            }
+                        }
+                    },
+                    name:key,
+                    type:'line',
+                    data:datas[key]
+                });
+            }
+
+            option.series = tmp;
+            option.legend.data = legends;
+
+
+            tmp = tmp.sort(sortBy("price", false));
+            var html = "";
+            for(var i in tmp) {
+                html += `<li><span class="name">${tmp[i].name}</span><span>${tmp[i].price}</span></li>`;
+            }
+            window.realtimePrice.innerHTML = html;
+
+
+            myChart.setOption(option);
+
+            window.date.innerHTML = da;
+
+        })})
+    }, 1000)
+
+
+    //排序
+    function sortBy(attr,rev){
+        //第二个参数没有传递 默认升序排列
+        if(rev ==  undefined){
+            rev = 1;
+        }else{
+            rev = (rev) ? 1 : -1;
+        }
+
+        return function(orgName,b){
+            orgName = orgName[attr];
+            b = b[attr];
+            if(orgName < b){
+                return rev * -1;
+            }
+            if(orgName > b){
+                return rev * 1;
+            }
+            return 0;
+        }
+
+    }
+
+    function setZoon(){
+        var min = window.priceMin.value;
+        if(Mtils.validation.isNumber(min)) {
+            // ,min:430,
+            option.yAxis.min = min;
+        } else {
+            delete option.yAxis.min
+        }
+
+        myChart.setOption(option)
+
+    }
+
+
+    layui.use(['element'], function(){
+        var element = layui.element
+            ,$      = layui.jquery;
+
+        // you code ...
+
+        fetch(location.origin + "/common-core/v1/init/allTypes").then(function(res) {res.json().then(function(res) {
+            if(0 == res.code) {
+                var html = "";
+                for(var orgName in res.data) {
+                    if(res.data[orgName] == currentType) {
+                        html += `<option selected>${res.data[orgName]}</option>`;
+                    } else {
+                        html += `<option>${res.data[orgName]}</option>`;
+                    }
+                }
+                window.types.innerHTML = html;
+            }
+        })})
+    });
+</script>
+</body>
+</html>

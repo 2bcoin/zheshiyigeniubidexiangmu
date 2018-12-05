@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:task="http://www.springframework.org/schema/task" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!-- 自动扫描SpringMVC包 ,将带有注解的类 纳入spring容器管理 -->
+    <context:component-scan base-package="com.github.misterchangray"/>
+
+    <!-- 引入配置文件;请注意申明配置时key不要重复 -->
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list> <!-- 系统配置 -->
+                <value>classpath*:mongodb.properties</value>
+                <!-- 系统配置 -->
+                <value>classpath*:config.properties</value>
+
+            </list>
+        </property>
+    </bean>
+
+
+    <!-- 引入mongo配置文件 -->
+    <import resource="classpath*:spring-mongodb.xml"/>
+
+
+    <!-- 配置使Spring采用CGLIB代理 -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+    <!-- 使用annotation注解方式配置事务,启用对事务注解的支持 -->
+    <tx:annotation-driven />
+
+    <!-- 使用annotation注解方式配置轮询任务,启用对轮询任务注解的支持 -->
+    <task:annotation-driven scheduler="myScheduler"/>
+    <!-- 配置轮询任务线程池;避免多任务问题 -->
+    <task:scheduler id="myScheduler" pool-size="10"/>
+
+    <!-- 异步线程池 -->
+    <bean id="taskExecutor"
+          class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <!-- 核心线程数 -->
+        <property name="corePoolSize" value="100" />
+        <!-- 最大线程数 -->
+        <property name="maxPoolSize" value="300" />
+        <!-- 队列最大长度 >=mainExecutor.maxSize -->
+        <property name="queueCapacity" value="1000" />
+        <!-- 线程池维护线程所允许的空闲时间 -->
+        <property name="keepAliveSeconds" value="3000" />
+        <!-- 线程池对拒绝任务(无线程可用)的处理 策略 -->
+        <!-- 若不作该处理，当线程满了，队列满了之后，继续往下增加任务，则抛出异常，拒绝该任务 -->
+        <!-- <property name="rejectedExecutionHandler"> <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy" /> </property> -->
+    </bean>
+
+</beans>

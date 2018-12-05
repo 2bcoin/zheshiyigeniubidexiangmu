@@ -1,0 +1,141 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+  <display-name>web core package</display-name>
+
+    <display-name>Archetype Created Web Application</display-name>
+    <!--welcome pages-->
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+    <!--当系统出现404错误，跳转到页面NoPage.html-->
+    <error-page>
+        <error-code>404</error-code>
+        <location>/WEB-INF/404.html</location>
+    </error-page>
+    <!--当系统出现java.lang.NullPointerException，跳转到页面error.html-->
+    <error-page>
+        <exception-type>java.lang.NullPointerException</exception-type>
+        <location>/WEB-INF/error.html</location>
+    </error-page>
+    <!--会话超时配置，单位分钟-->
+    <session-config>
+        <session-timeout>360</session-timeout>
+    </session-config>
+
+    <!--Spring框架给我们提供过滤器CharacterEncodingFilter
+    这个过滤器就是针对于每次浏览器请求进行过滤的，然后再其之上添加了父类没有的功能即处理字符编码。
+    其中encoding用来设置编码格式，forceEncoding用来设置是否理会 request.getCharacterEncoding()方法，设置为true则强制覆盖之前的编码格式。-->
+    <filter>
+        <filter-name>characterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>characterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 项目中使用Spring时，applicationContext.xml配置文件中并没有BeanFactory，要想在业务层中的class文件中直接引用Spring容器管理的bean可通过以下方式-->
+    <!--1、在web.xml配置监听器ContextLoaderListener。ContextLoaderListener的作用就是启动Web容器时，自动装配ApplicationContext的配置信息。因为它实现了ServletContextListener这个接口，在web.xml配置这个监听器，启动容器时，就会默认执行它实现的方法。
+    在ContextLoaderListener中关联了ContextLoader这个类，所以整个加载配置过程由ContextLoader来完成。-->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <!--2、部署applicationContext的xml文件。如果在web.xml中不写任何参数配置信息，默认的路径是"/WEB-INF/applicationContext.xml，
+    在WEB-INF目录下创建的xml文件的名称必须是applicationContext.xml。
+    如果是要自定义文件名可以在web.xml里加入contextConfigLocation这个context参数：
+    在<param-value> </param-value>里指定相应的xml文件名，如果有多个xml文件，可以写在一起并以“,”号分隔，也可以这样applicationContext-*.xml采用通配符，匹配的文件都会一同被载入。
+    在ContextLoaderListener中关联了ContextLoader这个类，所以整个加载配置过程由ContextLoader来完成。-->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:applicationContext.xml</param-value>
+    </context-param>
+
+    <!--如果你的DispatcherServlet拦截"/"，为了实现REST风格，拦截了所有的请求，那么同时对*.js,*.jpg等静态文件的访问也就被拦截了。-->
+    <!--方案一：激活Tomcat的defaultServlet来处理静态文件-->
+    <!--要写在DispatcherServlet的前面，让defaultServlet先拦截请求，这样请求就不会进入Spring了 -->
+    <!-- 因为使用swagger所以关闭此拦截器
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.css</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.swf</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.gif</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.jpg</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.png</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.js</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.html</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.xml</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.json</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.map</url-pattern>
+    </servlet-mapping>
+    -->
+
+    <!--使用Spring MVC,配置DispatcherServlet是第一步。DispatcherServlet是一个Servlet,,所以可以配置多个DispatcherServlet-->
+    <!--DispatcherServlet是前置控制器，配置在web.xml文件中的。拦截匹配的请求，Servlet拦截匹配规则要自已定义，把拦截下来的请求，依据某某规则分发到目标Controller(我们写的Action)来处理。-->
+    <!--配置SpringMVC DispatcherServlet-->
+    <servlet>
+        <!--在DispatcherServlet的初始化过程中，框架会在web应用的 WEB-INF文件夹下寻找名为[servlet-name]-servlet.xml 的配置文件，生成文件中定义的bean。-->
+        <servlet-name>springMVC</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <!--指明了配置文件的文件名，不使用默认配置文件名，而使用spring-mvc.xml配置文件。-->
+            <param-name>contextConfigLocation</param-name>
+            <!--其中<param-value>**.xml</param-value> 这里可以使用多种写法-->
+            <!--1、不写,使用默认值:/WEB-INF/<servlet-name>-servlet.xml-->
+            <!--2、<param-value>/WEB-INF/classes/dispatcher-servlet.xml</param-value>-->
+            <!--3、<param-value>classpath*:dispatcher-servlet.xml</param-value>-->
+            <!--4、多个值用逗号分隔-->
+            <param-value>classpath:spring-mvc.xml</param-value>
+        </init-param>
+        <!--是启动顺序，让这个Servlet随Servlet容器一起启动。-->
+        <load-on-startup>1</load-on-startup>
+        <async-supported>true</async-supported>
+    </servlet>
+    <servlet-mapping>
+        <!--这个Servlet的名字是dispatcher，可以有多个DispatcherServlet，是通过名字来区分的。每一个DispatcherServlet有自己的WebApplicationContext上下文对象。同时保存的ServletContext中和Request对象中.-->
+        <!--ApplicationContext是Spring的核心，Context我们通常解释为上下文环境，我想用“容器”来表述它更容易理解一些，ApplicationContext则是“应用的容器”了，Spring把Bean放在这个容器中，在需要的时候，用getBean方法取出-->
+        <servlet-name>springMVC</servlet-name>
+        <!--Servlet拦截匹配规则可以自已定义，当映射为@RequestMapping("/user/add")时，为例,拦截哪种URL合适？-->
+        <!--1、拦截*.do、*.htm， 例如：/user/add.do,这是最传统的方式，最简单也最实用。不会导致静态文件（jpg,js,css）被拦截。-->
+        <!--2、拦截/，例如：/user/add,可以实现现在很流行的REST风格。很多互联网类型的应用很喜欢这种风格的URL。弊端：会导致静态文件（jpg,js,css）被拦截后不能正常显示。 -->
+        <url-pattern>/</url-pattern><!--会拦截URL中带“/”的请求。-->
+    </servlet-mapping>
+
+</web-app>

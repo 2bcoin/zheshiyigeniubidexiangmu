@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title></title>
+    <link rel="stylesheet" href="../frame/layui/css/layui.css">
+    <link rel="stylesheet" href="../frame/static/css/style.css">
+    <link rel="icon" href="../frame/static/image/code.png">
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<script src="../frame/Mtils.js"></script>
+<body class="body">
+<div class="layui-tab" id="showTable">
+    <ul class="layui-tab-title">
+        <li class="layui-this">发明者配置</li>
+    </ul>
+    <div class="layui-tab-content">
+        <!--tab页1-->
+        <div class="layui-tab-item layui-show">
+            <button class="layui-btn" id="addTaBtn">添加发明者配置</button>
+            <button class="layui-btn" onclick="reload()"><i class="layui-icon">ဂ</i></button>
+            <span>共<span id="count"></span>个发明者配置</span>
+            <div class="layui-layer-content">
+                <div class="layui-row">
+                    <div class="layui-col-md12">
+                        <table class="layui-table">
+                            <thead>
+                            <tr>
+                                <th>配置名称</th>
+                                <th>AKEY</th>
+                                <th>ORG</th>
+                                <th>COIN</th>
+                                <th>TYPE</th>
+                                <th>ContractType</th>
+                                <th>Direction</th>
+                                <th>MarginLevel</th>
+                                <th>DefaultPeriod</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody id="list2">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="demo7"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="addTaWindow" style="display: none;width: 900px">
+    <div class="layui-col-xs11 layui-col-sm11 layui-col-md11" style="text-align: center">
+        <div style="margin-top: 10px;margin-left: 20px;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">配置名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" lay-verify="" autocomplete="off" placeholder="配置名称" id="titName"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">AKEY</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" lay-verify="" autocomplete="off" placeholder="AKEY" id="akey"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">SKEY</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" lay-verify="" autocomplete="off" placeholder="SKEY" id="skey"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">ORG</label>
+                <div class="layui-input-block">
+                    <select id="orgsl" class="layui-input" name="org" lay-verify="">
+                        <option value="OKEX">OKEX</option>
+                        <option value="Bitmex">Bitmex</option>
+                        <option value="Fcoin">Fcoin</option>
+                        <option value="HuoBi">HuoBi</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">COIN</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" lay-verify="" autocomplete="off" placeholder="COIN" id="coin"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">TYPE</label>
+                <div class="layui-input-block">
+                    <select id="type" class="layui-input" name="type" lay-verify="">
+                        <option value="otc">otc</option>
+                        <option value="spot">spot</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">ContractType</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" lay-verify="" autocomplete="off" placeholder="ContractType"
+                           id="contype"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">Direction</label>
+                <div class="layui-input-block">
+                    <select id="direction" class="layui-input" name="direction" lay-verify="">
+                        <option value="buy">buy</option>
+                        <option value="closebuy">closebuy</option>
+                        <option value="sell">sell</option>
+                        <option value="closesell">closesell</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">MarginLevel</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" lay-verify="" autocomplete="off" placeholder="MarginLevel"
+                           id="mlevel"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">DefaultPeriod</label>
+                <div class="layui-input-block">
+                    <select id="defaultsl" class="layui-input" name="default" lay-verify="">
+                        <option value="PERIOD_M5">PERIOD_M5</option>
+                        <option value="PERIOD_M15">PERIOD_M15</option>
+                        <option value="PERIOD_M30">PERIOD_M30</option>
+                        <option value="PERIOD_H1">PERIOD_H1</option>
+                        <option value="PERIOD_D1">PERIOD_D1</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 15px;margin-left: 20px;">
+            <button id="save" class="layui-btn">保存</button>
+        </div>
+    </div>
+
+</div>
+
+
+<div id="addTaWindow1" style="display: none;width: 900px">
+    <div class="layui-col-xs11 layui-col-sm11 layui-col-md11" style="text-align: center">
+        <div style="margin-top: 10px;margin-left: 20px;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">配置名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" lay-verify="" autocomplete="off" placeholder="配置名称" id="titName1"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">AKEY</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" disabled="disabled" lay-verify="" autocomplete="off"
+                           placeholder="AKEY" id="akey1"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">SKEY</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" disabled="disabled" lay-verify="" autocomplete="off"
+                           placeholder="SKEY" id="skey1"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">ORG</label>
+                <div class="layui-input-block">
+                    <select id="orgsl1" disabled="disabled" class="layui-input" name="org" lay-verify="">
+                        <option value="OKEX">OKEX</option>
+                        <option value="Bitmex">Bitmex</option>
+                        <option value="Fcoin">Fcoin</option>
+                        <option value="HuoBi">HuoBi</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">COIN</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" disabled="disabled" lay-verify="" autocomplete="off"
+                           placeholder="COIN" id="coin1"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">TYPE</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" disabled="disabled" lay-verify="" autocomplete="off"
+                           placeholder="TYPE" id="type1"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">ContractType</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" disabled="disabled" lay-verify="" autocomplete="off"
+                           placeholder="ContractType"
+                           id="contype1"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">Direction</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" disabled="disabled" lay-verify="" autocomplete="off"
+                           placeholder="Direction"
+                           id="direction1"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">MarginLevel</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" disabled="disabled" lay-verify="" autocomplete="off"
+                           placeholder="MarginLevel"
+                           id="mlevel1"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">DefaultPeriod</label>
+                <div class="layui-input-block">
+                    <select id="defaultsl1" disabled="disabled" class="layui-input" name="default" lay-verify="">
+                        <option value="PERIOD_M5">PERIOD_M5</option>
+                        <option value="PERIOD_M15">PERIOD_M15</option>
+                        <option value="PERIOD_M30">PERIOD_M30</option>
+                        <option value="PERIOD_H1">PERIOD_H1</option>
+                        <option value="PERIOD_D1">PERIOD_D1</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="../frame/layui/layui.js"></script>
+</body>
+
+<script type="text/javascript">
+
+    var index = null;
+    var laypage = null;
+    //分页数据
+    var dataObj = {
+        pageSize: 20,
+        pageNumber: 1,
+    };
+
+    // you code ...
+    layui.use(['element', 'layer', 'laytpl','laypage'], function () {
+        var $ = layui.jquery
+            , element = layui.element,
+            laytpl = layui.laytpl;
+        laypage = layui.laypage;
+        window.$ = layui.jquery;
+        reload();
+        $('.site-demo-active').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //保存 api
+        $("#save").on("click", function () {
+            //下拉框选择项
+            var ORG = $("#orgsl").find("option:selected").text();
+            var DefaultPeriod = $("#defaultsl").find("option:selected").text();
+            var TYPE = $("#type").find("option:selected").text();
+            var DIRECTION = $("#direction").find("option:selected").text();
+            var json = {
+                title: window.titName.value,
+                akey: window.akey.value,
+                skey: window.skey.value,
+                org: ORG,
+                coin: window.coin.value,
+                type: TYPE,
+                contractType: window.contype.value,
+                direction: DIRECTION,
+                marginLevel: window.mlevel.value,
+                defaultPeriod: DefaultPeriod,
+            };
+            $.ajax({
+                type: "POST",
+                url: location.origin + "/common-core/v1/fmz/add",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "Authorization": localStorage.session
+                },
+                data: JSON.stringify(json),
+                dataType: "json",
+                success: function (message) {
+                    if (0 == message.code) {
+                        layer.open({content: `操作成功;成功加入`});
+                        layer.close(index);
+                        reload();
+                    } else {
+                        layer.open({content: message.msg})
+                    }
+
+                }
+            });
+        });
+        // you code ...
+        $("#addTaBtn").on("click", function () {
+
+            $("#titName").val("");
+            $("#akey").val("");
+            $("#skey").val("");
+            $("#mlevel").val("10");
+            index = layer.open({
+                type: 1,
+                content: $('#addTaWindow'), //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+                area: ['1100', '500px']
+            });
+        })
+
+    });
+
+    function del(id,title) {
+        if (id) {
+            layer.confirm('确认删除('+title+')?', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                $.ajax({
+                    type: "GET",
+                    url: window.location.origin + "/common-core/v1/fmz/del?id=" + id,
+                    headers: {
+                        "Authorization": localStorage.session
+                    },
+                    success: function (res) {
+                        if (0 == res.code) {
+                            layer.open({content: "操作成功;"})
+                            reload();
+                        }
+                    }
+                });
+            });
+        }
+    }
+
+    function details(id) {
+        $.ajax({
+            type: "GET",
+            url: window.location.origin + "/common-core/v1/fmz/findOne?id=" + id,
+            headers: {
+                "Authorization": localStorage.session
+            },
+
+            success: function (res) {
+                if (res.code == 0) {
+                    $("#titName1").val(res.data.title);
+                    $("#akey1").val(res.data.akey);
+                    $("#skey1").val(res.data.skey);
+                    $("#coin1").val(res.data.coin);
+                    $("#type1").val(res.data.type);
+                    $("#contype1").val(res.data.contractType);
+                    $("#direction1").val(res.data.direction);
+                    $("#mlevel1").val(res.data.marginLevel);
+                    $("#orgsl1").val(res.data.org);
+                    $("#defaultsl1").val(res.data.defaultPeriod);
+                    index = layer.open({
+                        type: 1,
+                        content: $('#addTaWindow1'), //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+                        area: ['1100', '500px'],
+                    });
+                } else {
+                    layer.msg(res.msg);
+                }
+            }
+        })
+    }
+
+    function reload() {
+        $.ajax({
+            type: "GET",
+            url: window.location.origin + "/common-core/v1/fmz/list?pageSize=" + dataObj.pageSize + "&pageNumber=" + dataObj.pageNumber,
+            headers: {
+                "Authorization": localStorage.session
+            },
+            success: function (res) {
+                console.log(res);
+                if (res.success && res.data.list) {
+                    var html = "";
+                    res.data.list.forEach(function (line) {
+                        html += ` <tr>
+                            <td>${line.title}</td>
+                            <td>${line.akey}</td>
+                            <td>${line.org}</td>
+                            <td>${line.coin}</td>
+                            <td>${line.type}</td>
+                            <td>${line.contractType}</td>
+                            <td>${line.direction}</td>
+                            <td>${line.marginLevel}</td>
+                            <td>${line.defaultPeriod}</td>
+                            <td>${formatDate(line.creatTime, "yyyy-MM-dd hh:mm:ss")}</td>
+                             <td>
+                                <button onclick="details('${line.id}')" class="layui-btn layui-btn-xs">详情</button>
+                                <button onclick="del('${line.id}','${line.title}')" class="layui-btn layui-btn-danger">删除</button>
+                            </td>
+                        </tr>`;
+                    })
+                    window.list2.innerHTML = html;
+                    window.count.innerHTML = res.data.pageResult.total;
+
+                    //完整功能
+                    laypage.render({
+                        elem: 'demo7'
+                        , count: res.data.pageResult.total
+                        , first: '首页'
+                        , last: '尾页'
+                        , limit: dataObj.pageSize
+                        , curr: dataObj.pageNumber
+                        , layout: ['count', 'prev', 'page', 'next']
+                        , jump: function (obj, first) {
+                            if (!first) {
+                                dataObj.pageNumber = obj.curr;
+                                reload();
+                            }
+                        }
+                    });
+
+                }
+            }
+        });
+    }
+
+    function formatDate(timestamp, pattern) {
+        var tmp = new Date(timestamp);
+        var o = {
+            "M+": tmp.getMonth() + 1, //month
+            "d+": tmp.getDate(), //day
+            "h+": tmp.getHours(), //hour
+            "m+": tmp.getMinutes(), //minute
+            "s+": tmp.getSeconds(), //second
+            "q+": Math.floor((tmp.getMonth() + 3) / 3), //quarter
+            "S": tmp.getMilliseconds() //millisecond
+        }
+
+        if (/(y+)/.test(pattern)) {
+            pattern = pattern.replace(RegExp.$1, (tmp.getFullYear() + "").substr(4 - RegExp.$1.length));
+        }
+
+        for (var k in o) {
+            if (new RegExp("(" + k + ")").test(pattern)) {
+                pattern = pattern.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+            }
+        }
+        return pattern;
+    }
+
+</script>
+
+</html>

@@ -1,0 +1,41 @@
+{
+  "data": [
+    {
+      "text": "平台管理",
+      "icon": "&#xe620;",
+      "subset": [
+        {
+          "text": "策略配置",
+          "icon": "&#xe621;",
+          "href": "page/scriptData.html"
+        },
+        {
+          "text": "托管者配置",
+          "icon": "&#xe621;",
+          "href": "page/ipAndScript.html"
+        },
+        {
+          "text": "平台配置",
+          "icon": "&#xe621;",
+          "href": "page/fmzconfigs.html"
+        },
+        {
+          "text": "监控配置",
+          "icon": "&#xe621;",
+          "href": "page/monitorConfig.html"
+        }
+      ]
+    },{
+      "text": "API_KEY测试",
+      "icon": "&#xe628;",
+      "href": "",
+      "subset": [
+        {
+          "text": "测试下单",
+          "icon": "&#xe621;",
+          "href": "page/placeTheOrder.html"
+        }
+      ]
+    }
+  ]
+}

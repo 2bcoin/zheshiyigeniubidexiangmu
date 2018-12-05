@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>欢迎页-总览</title>
+    <link rel="stylesheet" href="../frame/layui/css/layui.css">
+    <link rel="stylesheet" href="../frame/static/css/style.css">
+    <link rel="icon" href="../frame/static/image/code.png">
+</head>
+<body class="body">
+
+<div class="layui-row layui-col-space10 my-index-main">
+    <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+        <div id="itushuo-tbgsr"><script src='https://www.itushuo.com/inject/tbgsr' defer="defer"></script></div>
+    </div>
+</div>
+
+<script type="text/javascript" src="../frame/layui/layui.js"></script>
+<script type="text/javascript" src="../js/index.js"></script>
+<script type="text/javascript" src="../frame/echarts/echarts.min.js"></script>
+<script type="text/javascript">
+    layui.use(['element', 'form', 'table', 'layer', 'vip_tab'], function () {
+        var form = layui.form
+                , table = layui.table
+                , layer = layui.layer
+                , vipTab = layui.vip_tab
+                , element = layui.element
+                , $ = layui.jquery;
+
+
+
+        // 打开选项卡
+        $('.my-nav-btn').on('click', function(){
+            if($(this).attr('data-href')){
+                //vipTab.add('','标题','路径');
+                vipTab.add($(this),'<i class="layui-icon">'+$(this).find("button").html()+'</i>'+$(this).find('p:last-child').html(),$(this).attr('data-href'));
+            }
+        });
+
+        // you code ...
+
+
+    });
+</script>
+</body>
+</html>

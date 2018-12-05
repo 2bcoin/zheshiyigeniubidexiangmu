@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title></title>
+    <link rel="stylesheet" href="../frame/layui/css/layui.css">
+    <link rel="stylesheet" href="../frame/static/css/style.css">
+    <link rel="icon" href="../frame/static/image/code.png">
+</head>
+<script src="../frame/Mtils.js"></script>
+<body class="body">
+<div class="layui-tab">
+    <ul class="layui-tab-title">
+        <li class="layui-this">策略配置</li>
+    </ul>
+    <div class="layui-tab-content">
+        <!--tab页2-->
+        <div class="layui-tab-item layui-show">
+
+            <button class="layui-btn" id="addTaBtn">添加策略</button>
+            <button class="layui-btn" onclick="reload()"><i class="layui-icon">ဂ</i></button>
+            <span>共<span id="count"></span>个策略</span>
+            <table class="layui-table">
+                <thead>
+                <tr>
+                    <th>添加时间</th>
+                    <th>更新时间</th>
+                    <th>标题</th>
+                    <th>分类</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody id="list2">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div id="addTaWindow" style="display: none;width: 900px">
+    <div class="layui-col-xs11 layui-col-sm11 layui-col-md11" style="text-align: center">
+        <div style="margin-top: 10px;margin-left: 20px;">
+            <input type="text" id="id" style="display:none">
+            <div class="layui-form-item">
+                <label class="layui-form-label">标题</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" lay-verify="title" autocomplete="off" placeholder="标题" id="biaoti"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">分类</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" lay-verify="title" autocomplete="off" placeholder="分类" id="fenlei"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">脚本</label>
+                <div class="layui-input-block">
+                <textarea name="title" rows="12" lay-verify="title" placeholder="请输入内容" class="layui-textarea"
+                          id="jiaoben"></textarea>
+                </div>
+            </div>
+
+        </div>
+        <div style="margin-top: 15px;margin-left: 20px;">
+            <button id="save" class="layui-btn">保存</button>
+        </div>
+    </div>
+
+</div>
+
+
+<script type="text/javascript" src="../frame/layui/layui.js"></script>
+</body>
+
+
+<script type="text/javascript">
+
+    var index = null;
+
+    // you code ...
+    layui.use(['element', 'layer', 'laytpl'], function () {
+        var $ = layui.jquery
+            , element = layui.element,
+            laytpl = layui.laytpl;
+        window.$ = layui.jquery;
+        reload();
+        $('.site-demo-active').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //保存 api
+        $("#save").on("click", function () {
+            var id = $("#id").val();
+            console.log(id);
+            var json = {
+                title: window.biaoti.value,
+                scriptStr: window.jiaoben.value,
+                tag: window.fenlei.value,
+                id: id
+            };
+            if (json.title == '' || json.title == null){
+                layer.msg("标题不能为空");
+                return false;
+            }
+            if (json.scriptStr == '' || json.scriptStr == null){
+                layer.msg("脚本不能为空");
+                return false;
+            }
+            if (json.title && json.scriptStr) {
+                $.ajax({
+                    type: "POST",
+                    url: location.origin + "/common-core/v1/scriptData/aouScript",
+                    contentType: "application/json; charset=utf-8",
+                    headers: {
+                        "Authorization": localStorage.session
+                    },
+                    data: JSON.stringify(json),
+                    dataType: "json",
+                    success: function (message) {
+                        if (0 == message.code) {
+                            layer.open({content: "操作成功;成功加入"});
+                            layer.close(index);
+                            reload();
+                        } else {
+                            layer.open({content: message.msg})
+                        }
+
+                    }
+                });
+            }
+
+        });
+        // you code ...
+        $("#addTaBtn").on("click", function () {
+
+            $("#id").val('');
+            $("#biaoti").val('');
+            $("#jiaoben").val('');
+            $("#fenlei").val('');
+
+            index = layer.open({
+                type: 1,
+                content: $('#addTaWindow'), //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+                area: ['1100', '500px']
+            });
+        })
+
+    });
+
+    function del(id) {
+        if (id) {
+            layer.confirm('确认删除？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                $.ajax({
+                    type: "GET",
+                    url: window.location.origin + "/common-core/v1/scriptData/delScript?id=" + id,
+                    headers: {
+                        "Authorization": localStorage.session
+                    },
+                    success: function (res) {
+                        if (0 == res.code) {
+                            layer.open({content: "操作成功;"})
+                            reload();
+                        }
+                    }
+                });
+            });
+        }
+    }
+
+    function update(id) {
+        $.ajax({
+            type: "GET",
+            url: window.location.origin + "/common-core/v1/scriptData/finOne?id=" + id,
+            headers: {
+                "Authorization": localStorage.session
+            },
+            success: function (res) {
+                if (res.success && res.data) {
+
+                    $("#id").val(id);
+                    $("#biaoti").val(res.data.title);
+                    $("#jiaoben").val(res.data.scriptStr);
+                    $("#fenlei").val(res.data.tag);
+
+                    index = layer.open({
+                        type: 1,
+                        title: '编辑',
+                        content: $('#addTaWindow'), //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+                        area: ['1100', '500px'],
+                    });
+                }
+            }
+        });
+    }
+
+
+    function reload() {
+        $.ajax({
+            type: "GET",
+            url: window.location.origin + "/common-core/v1/scriptData/listScript",
+            headers: {
+                "Authorization": localStorage.session
+            },
+            success: function (res) {
+                if (res.success && res.data) {
+                    res.data.reverse();
+                    var html = "";
+                    window.count.innerHTML = res.data.length;
+                    res.data.forEach(function (line) {
+                        html += ` <tr>
+                            <td>${Mtils.extention.formatDate(line.creatTime, "yyyy-MM-dd hh:mm:ss")}</td>
+                            <td>${Mtils.extention.formatDate(line.updateTime, "yyyy-MM-dd hh:mm:ss")}</td>
+                             <td>${line.title}</td>
+                            <td>${line.tag}</td>
+                             <td>
+                                <button onclick="update('${line.id}')" class="layui-btn layui-btn-danger">修改</button>
+                                <button onclick="del('${line.id}')" class="layui-btn layui-btn-danger">删除</button>
+                            </td>
+                        </tr>`;
+                    })
+                    window.list2.innerHTML = html;
+                    window.count.innerHTML = res.data.length;
+                }
+            }
+        });
+    }
+</script>
+
+</html>

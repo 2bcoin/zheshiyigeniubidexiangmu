@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title></title>
+    <link rel="stylesheet" href="../frame/layui/css/layui.css">
+    <link rel="stylesheet" href="../frame/static/css/style.css">
+    <link rel="icon" href="../frame/static/image/code.png">
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<script src="../frame/Mtils.js"></script>
+<body class="body">
+<div class="layui-tab" id="showTable">
+    <ul class="layui-tab-title">
+        <li class="layui-this">API_KEY测试</li>
+    </ul>
+    <div class="layui-tab-content">
+        <!--tab页1-->
+        <div class="layui-col-xs11 layui-col-sm11 layui-col-md11" style="text-align: center">
+            <div style="margin-top: 10px;margin-left: 20px;">
+                <form class="layui-form" action="">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">AKEY</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="title" placeholder="AKEY" class="layui-input" id="akey">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">SKEY</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="title" placeholder="SKEY" class="layui-input" id="skey">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">交易所</label>
+                        <div class="layui-input-block">
+                            <select id="bourse" name="bourse" lay-filter="bourse_S">
+                                <option value=""></option>
+                                <option value="0">OKEX</option>
+                                <option value="1">Bitmex</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item" pane="">
+                        <label class="layui-form-label">币种</label>
+                        <div class="layui-input-block">
+                            <input id="coin" type="text" placeholder="coin" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">合约</label>
+                        <div class="layui-input-block">
+                            <input id="contract" type="text" placeholder="contract"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div style="margin-top: 15px;margin-left: 20px;">
+                <button id="save" class="layui-btn">测试</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="../frame/layui/layui.js"></script>
+</body>
+
+<script type="text/javascript">
+
+    // you code ...
+    layui.use(['element', 'layer', 'laytpl', 'form'], function () {
+        var $ = layui.jquery
+            , element = layui.element,
+            laytpl = layui.laytpl;
+        form = layui.form;
+        window.$ = layui.jquery;
+
+        form.render();
+
+        //定义一个数组，用于设置默认值
+        var defaultSetting = [
+            {
+                org: "OKEX",
+                coin: "eos",
+                contract: "quarter",
+                tag: "0"
+            }, {
+                org: "Bitmex",
+                coin: "eos",
+                contract: "XBTUSD",
+                tag: "1"
+            }
+        ];
+
+        //监听下拉框的值的改变
+        form.on('select(bourse_S)', function (data) {
+            //console.log(data.value); //得到被选中的值
+            $.each(defaultSetting, function (index, value) {
+                if (data.value == value.tag) {
+                    $("#coin").val(value.coin);
+                    $("#contract").val(value.contract);
+                }else if(data.value == ""){
+                    $("#coin").val("");
+                    $("#contract").val("");
+                }
+            });
+        });
+
+        //保存 api
+        $("#save").on("click", function () {
+            var akey = $("#akey").val();
+            var skey = $("#skey").val();
+            var bourse = $("#bourse").find("option:selected").text();
+            var coin = $("#coin").val();
+            var contract = $("#contract").val();
+
+            var json = {
+                akey: akey,
+                skey: skey,
+                bourse: bourse,
+                coin: coin,
+                contract: contract,
+            };
+            if (json.akey == '' || json.akey == null) {
+                layer.msg("AKEY不能为空");
+                return false;
+            }
+            if (json.skey == "" || json.skey == null) {
+                layer.msg("SKEY不能为空");
+                return false;
+            }
+            if (json.bourse == '' || json.bourse == null) {
+                layer.msg("交易所不能为空");
+                return false;
+            }
+            if (json.coin == '' || json.coin == null) {
+                layer.msg("币种不能为空");
+                return false;
+            }
+            if (json.contract == '' || json.contract == null) {
+                layer.msg("合约类型不能为空");
+                return false;
+            }
+            if (json.akey && json.skey) {
+                $.ajax({
+                    type: "POST",
+                    url: location.origin + "/common-core/v1/atest/akey",
+                    contentType: "application/json; charset=utf-8",
+                    headers: {
+                        "Authorization": localStorage.session
+                    },
+                    data: JSON.stringify(json),
+                    dataType: "json",
+                    success: function (message) {
+                        if (0 == message.code) {
+                            layer.open({content: message.msg});
+                        } else {
+                            layer.open({content: message.msg})
+                        }
+
+                    }
+                });
+            }
+        });
+    });
+
+</script>
+
+</html>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title></title>
+    <link rel="stylesheet" href="../frame/layui/css/layui.css">
+    <link rel="stylesheet" href="../frame/static/css/style.css">
+    <link rel="icon" href="../frame/static/image/code.png">
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<script src="../frame/Mtils.js"></script>
+<body class="body">
+<div class="layui-tab" id="showTable">
+    <ul class="layui-tab-title">
+        <li class="layui-this">托管者配置</li>
+    </ul>
+    <div class="layui-tab-content">
+        <!--tab页1-->
+        <div class="layui-tab-item layui-show">
+            <button class="layui-btn" id="addTaBtn">添加托管者</button>
+            <button class="layui-btn" onclick="reload()"><i class="layui-icon">ဂ</i></button>
+            <span>共<span id="count"></span>个托管者</span>
+            <div class="layui-layer-content">
+                <div class="layui-row">
+                    <div class="layui-col-md12">
+                        <table class="layui-table">
+                            <thead>
+                            <tr>
+                                <th>托管者名称</th>
+                                <th>托管者IP</th>
+                                <th>托管策略名称</th>
+                                <th>平台配置名称</th>
+                                <th>创建时间</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody id="list2">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="addTaWindow" style="display: none;width: 900px">
+    <div class="layui-col-xs11 layui-col-sm11 layui-col-md11" style="text-align: center">
+        <div style="margin-top: 10px;margin-left: 20px;">
+            <form class="layui-form" action="">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">托管者名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="title" lay-verify="title" autocomplete="off" placeholder="托管者名称"
+                               id="celue"
+                               class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">选择IP</label>
+                    <div class="layui-input-block">
+                        <select id="IPstr" name="ipstr" lay-verify="">
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">选择托管策略名称</label>
+                    <div class="layui-input-block">
+                        <select id="jiaobenshuju" name="jiaoben" lay-verify="">
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item" pane="">
+                    <label class="layui-form-label">平台配置</label>
+                    <div class="layui-input-block" id="fmzpeizhi">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">自定义配置</label>
+                    <div class="layui-input-block">
+                        <textarea name="desc" placeholder="请输入内容" id="customConfig" class="layui-textarea"></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div style="margin-top: 15px;margin-left: 20px;">
+            <button id="save" class="layui-btn">保存</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="detailsWindow" style="display: none;width: 900px">
+    <div class="layui-col-xs11 layui-col-sm11 layui-col-md11" style="text-align: center">
+        <div style="margin-top: 10px;margin-left: 20px;">
+            <form class="layui-form" lay-filter="showForm">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">托管者名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" autocomplete="off" id="celue1" disabled="disabled" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">IP</label>
+                    <div class="layui-input-block">
+                        <input type="text" autocomplete="off" id="IPstr1" disabled="disabled" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">托管策略名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" autocomplete="off" id="jiaobenshuju1" disabled="disabled"
+                               class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item" pane="">
+                    <label class="layui-form-label">平台配置</label>
+                    <div class="layui-input-block" id="fmzpeizhi1">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">自定义配置</label>
+                    <div class="layui-input-block">
+                        <textarea name="desc" placeholder="请输入内容" id="customConfig1" class="layui-textarea"></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="../frame/layui/layui.js"></script>
+</body>
+
+<script type="text/javascript">
+
+    var index = null;
+    var form = null;
+
+    // you code ...
+    layui.use(['element', 'layer', 'laytpl', 'form'], function () {
+        var $ = layui.jquery
+            , element = layui.element,
+            laytpl = layui.laytpl;
+        form = layui.form;
+        window.$ = layui.jquery;
+        reload();
+        $('.site-demo-active').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //保存 api
+        $("#save").on("click", function () {
+            var ip = $("#IPstr").find("option:selected").text();
+            var scriptName = $("#jiaobenshuju").find("option:selected").text();
+            var scriptID = $("#jiaobenshuju").val();
+
+            var config = [];
+            var configId = [];
+            $('input[name="configcheck"]:checked').each(function () {
+                config.push($(this).val());
+                configId.push($(this)[0].id);
+            });
+
+            var json = {
+                title: window.celue.value,
+                ip: ip,
+                scriptID: scriptID,
+                scriptName: scriptName,
+                configurationName: config,
+                configurationID: configId,
+                customConfig: window.customConfig.value
+            };
+            if (json.title == '' || json.title == null) {
+                layer.msg("策略名称不能为空");
+                return false;
+            }
+            if (json.ip == "请选择" || json.ip == null || json.ip == '') {
+                layer.msg("IP不能为空");
+                return false;
+            }
+            if (json.scriptID == '' || json.scriptID == null) {
+                layer.msg("策略不能为空");
+                return false;
+            }
+            if (configId.length == 0) {
+                layer.msg("平台配置不能为空");
+                return false;
+            }
+            if (json.ip && json.scriptID) {
+                $.ajax({
+                    type: "POST",
+                    url: location.origin + "/common-core/v1/scriptData/addIP",
+                    contentType: "application/json; charset=utf-8",
+                    headers: {
+                        "Authorization": localStorage.session
+                    },
+                    data: JSON.stringify(json),
+                    dataType: "json",
+                    success: function (message) {
+                        if (0 == message.code) {
+                            layer.open({content: `操作成功;成功加入`});
+                            layer.close(index);
+                            reload();
+                        } else {
+                            layer.open({content: message.msg})
+                        }
+
+                    }
+                });
+            }
+        });
+        // you code ...
+        $("#addTaBtn").on("click", function () {
+            //动态加载下拉框数据
+            getDataSelect();
+
+            $("#celue").val("");
+            $("#peizhi").val("");
+            $("#IPstr option:first").prop("selected", 'selected');
+            $("#jiaobenshuju option:first").prop("selected", 'selected');
+            $("#fmzpeizhi option:first").prop("selected", 'selected');
+            index = layer.open({
+                type: 1,
+                content: $('#addTaWindow'), //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+                area: ['865px', '457px']
+            });
+        })
+
+
+    });
+
+    function del(id) {
+        if (id) {
+            layer.confirm('确认删除？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                $.ajax({
+                    type: "GET",
+                    url: window.location.origin + "/common-core/v1/scriptData/delIP?id=" + id,
+                    headers: {
+                        "Authorization": localStorage.session
+                    },
+                    success: function (res) {
+                        if (0 == res.code) {
+                            layer.open({content: "操作成功;"})
+                            reload();
+                        }
+                    }
+                });
+            });
+        }
+    }
+
+
+    function reload() {
+        $.ajax({
+            type: "GET",
+            url: window.location.origin + "/common-core/v1/scriptData/listIP",
+            headers: {
+                "Authorization": localStorage.session
+            },
+            success: function (res) {
+                if (res.success && res.data.list) {
+                    res.data.list.reverse();
+                    var html = "";
+                    window.count.innerHTML = res.data.list.length;
+                    res.data.list.forEach(function (line) {
+                        html += ` <tr>
+                            <td>${line.title}</td>
+                            <td>${line.ip}</td>
+                            <td>${line.scriptName}</td>
+                            <td>${line.configurationName}</td>
+                            <td>${formatDate(line.creatTime, "yyyy-MM-dd hh:mm:ss")}</td>
+                            <td>${line.robotStatus}</td>
+                             <td>
+                                <button onclick="st('${line.id}')" class="layui-btn layui-btn-xs">启动</button>
+                                <button onclick="shutdown('${line.id}')" class="layui-btn layui-btn-xs">停止</button>
+                                <button onclick="details('${line.id}')" class="layui-btn layui-btn-xs">详情</button>
+                                <button onclick="showLog('${line.id}')" class="layui-btn layui-btn-xs">查看日志</button>
+                                <button onclick="del('${line.id}')" class="layui-btn layui-btn-xs">删除</button>
+                            </td>
+                        </tr>`;
+                    })
+                    window.list2.innerHTML = html;
+                    window.count.innerHTML = res.data.list.length;
+                }
+            }
+        });
+    }
+
+    function details(id) {
+        //详情页的多选框
+        $.ajax({
+            type: "GET",
+            url: window.location.origin + "/common-core/v1/scriptData/findOneIP?id=" + id,
+            headers: {
+                "Authorization": localStorage.session
+            },
+            success: function (res) {
+                if (res.code == 0) {
+
+                    //获得所要回显的值，此处为：100,1001,200,1400
+                    var checkArray = res.data.configurationID;
+                    console.log(checkArray);
+
+                    //动态加载下拉框数据
+                    $.ajax({
+                        url: window.location.origin + "/common-core/v1/scriptData/listIP",
+                        dataType: 'json',
+                        type: 'get',
+                        success: function (res) {
+                            var html2 = "";
+                            if (res.data.fmzList != null) {
+                                $.each(res.data.fmzList, function (index, item) {
+                                    var html1 = "";
+                                    for (var i = 0; i < checkArray.length; i++) {
+                                        if (item.id == checkArray[i]) {
+                                            html1 = `<input type="checkbox" id="${item.id}" value="${item.title}" title="${item.title}" name="configcheck1" lay-skin="primary" checked="checked">`;
+                                        }
+                                    }
+                                    if (html1 == "") {
+                                        html1 = `<input type="checkbox" id="${item.id}" value="${item.title}" title="${item.title}" name="configcheck1" lay-skin="primary">`;
+                                    }
+                                    html2 = html2 + html1;
+                                });
+                                if (html2 != $('#fmzpeizhi1').html()) {
+                                    $('#fmzpeizhi1').html(html2);
+                                }
+                            }
+                            //渲染多选框
+                            form.render("checkbox");
+                        }
+                    });
+
+                    $("#celue1").val(res.data.title);
+                    $("#IPstr1").val(res.data.ip);
+                    $("#jiaobenshuju1").val(res.data.scriptName);
+                    index = layer.open({
+                        type: 1,
+                        content: $('#detailsWindow'), //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+                        area: ['1100', '500px'],
+                        success: function (layero, index) {
+                        }
+                    });
+                } else {
+                    layer.msg(res.msg);
+                }
+            }
+        })
+    }
+
+    function st(id) {
+        if (id) {
+            var lock = false; //默认未锁定
+            layer.confirm('确认启动？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                if (!lock) {
+                    lock = true;
+                    $.ajax({
+                        type: "GET",
+                        url: window.location.origin + "/common-core/v1/scriptData/start?id=" + id,
+                        success: function (res) {
+                            if (res.code == 0) {
+                                layer.open({content: "启动成功"})
+                            } else {
+                                layer.open({content: res.msg})
+                            }
+                            reload();
+
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    function shutdown(id) {
+        if (id) {
+            var lock = false; //默认未锁定
+            layer.confirm('确认停止？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                if (!lock) {
+                    lock = true;
+                    $.ajax({
+                        type: "GET",
+                        url: window.location.origin + "/common-core/v1/scriptData/shutdown?id=" + id,
+                        success: function (res) {
+                            if (res.code == 0) {
+                                layer.open({content: "成功停止"})
+                            } else {
+                                layer.open({content: res.msg})
+                            }
+                            reload();
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    function showLog(id) {
+        $.ajax({
+            type: "GET",
+            url: window.location.origin + "/common-core/v1/scriptData/listIP",
+            headers: {
+                "Authorization": localStorage.session
+            },
+            success: function (res) {
+                if (res.success && res.data.list) {
+                    res.data.list.reverse();
+                    var html = "";
+                    window.count.innerHTML = res.data.list.length;
+                    res.data.list.forEach(function (line) {
+                        if (line.id == id) {
+                            var data = {
+                                id: line.id,
+                                scriptID: line.scriptID,
+                                ip: line.ip
+                            };
+                            data = Mtils.security.base64_encode(JSON.stringify(data));
+
+                            window.open("http://" + line.ip + ":8080/common-core/backsys/page/scriptRobotLog.html?data=" + data, "_blank");
+                        }
+                    })
+                }
+            }
+        });
+    }
+
+    setInterval(function () {
+        reload();
+    }, 10000);
+
+    function getDataSelect() {
+        //动态加载下拉框数据
+        $.ajax({
+            url: window.location.origin + "/common-core/v1/scriptData/listIP",
+            dataType: 'json',
+            type: 'get',
+            success: function (res) {
+                var html = "<option value=\"\"></option>";
+                if (res.data.scriptList != null) {
+                    $.each(res.data.scriptList, function (index, item) {
+                        html += `<option value="${item.id}">${item.title}</option>`;
+                    });
+                    if (html != $('#jiaobenshuju').html()) {
+                        $('#jiaobenshuju').html(html);
+                    }
+                }
+
+                var html1 = "<option value=\"\"></option>";
+                if (res.data.IPMap != null) {
+                    $.each(res.data.IPMap, function (key, values) {
+                        html1 += `<option value="${key}">${key}</option>`;
+                    });
+                    if (html1 != $('#IPstr').html()) {
+                        $('#IPstr').html(html1);
+                    }
+                }
+                var html2 = "";
+                if (res.data.fmzList != null) {
+                    $.each(res.data.fmzList, function (index, item) {
+                        html2 += `<input type="checkbox" id="${item.id}" value="${item.title}" title="${item.title}" name="configcheck" lay-skin="primary">`;
+                    });
+                    if (html2 != $('#fmzpeizhi').html()) {
+                        $('#fmzpeizhi').html(html2);
+                    }
+                }
+                //渲染多选框
+                form.render();
+            }
+        });
+    }
+
+    function formatDate(timestamp, pattern) {
+        var tmp = new Date(timestamp);
+        var o = {
+            "M+": tmp.getMonth() + 1, //month
+            "d+": tmp.getDate(), //day
+            "h+": tmp.getHours(), //hour
+            "m+": tmp.getMinutes(), //minute
+            "s+": tmp.getSeconds(), //second
+            "q+": Math.floor((tmp.getMonth() + 3) / 3), //quarter
+            "S": tmp.getMilliseconds() //millisecond
+        }
+
+        if (/(y+)/.test(pattern)) {
+            pattern = pattern.replace(RegExp.$1, (tmp.getFullYear() + "").substr(4 - RegExp.$1.length));
+        }
+
+        for (var k in o) {
+            if (new RegExp("(" + k + ")").test(pattern)) {
+                pattern = pattern.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+            }
+        }
+        return pattern;
+    }
+
+</script>
+
+</html>
