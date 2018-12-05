@@ -1,50 +1,23 @@
 # 欢迎使用 Common-Mvc
-基于maven的spring4.3+mybatis3.4+Swagger2.6的后台整合，用于快速构建中小型API、RESTful API项目，该项目简单、快速、易扩展；使我们摆脱那些重复劳动，专注于业务代码的编写。
+基于maven的spring4.3+mybatis3.4+Swagger2.6的后台整合，用于快速构建中小型API、RESTful API项目，该项目简单、快速、易扩展；使我们摆脱那些重复劳动，专注于业务代码的编写。本项目主要实现数字货币的量化交易基础框架及交易所接口的实现，使用者只写策略逻辑。项目为一拖N的实现，即一个中心服务器，N个托管者节点，每个节点可以运行多个策略，由于大多交易所对请求有限制，建议每个节点同一家交易所同时运行的策略3个以下。
 
-
-### 已完成功能
-- 增加权限统一拦截注解`@Authentication`
-- 增加方法性能统计注解`@printRunTime`
-- 增加简单的操作日志`@OperationLog`
-- 实现了用户登录日志
-- 实现了简单的权限系统
-- 生成entity类时自动提取数据库注释生成swagger文档
-- 实现了更漂亮的swagger-ui
-- 实现了邮件发送/验证码生成/正则验证
 
 ### 快速开始
 - clone本项目，创建下面的数据库和表
 - 使用IDE导入本项目，使用maven方式导入项目
 - 配置`jdbc.properties`下面的数据库相关信息（如果你需要使用mybitis逆向插件，也需要配置`generatorConfig.xml`这个文件中的数据库信息）
 - 使用maven编译后，配置tomcat并部署
-- 启动tomcat,访问以下链接测试接口；
-- 访问`http://localhost:8080/docs/index.html` 查看swagger2生成的Api文档信息
+- 启动tomcat
 - 根据需求进行快速迭代开发
 
-### 目前表单,详细信息在"/resources/archives"目录下
-```sql
-drop database common_core;
+### 需要配置的文件
+- 所有的.properties文件
 
-create database common_core;
-
-use common_core;
-
-create table user;
-
-create table role;
-
-create table permission;
-
-create table role_permission_map;
-
-create table user_role_map;
- 
-create table constant;
-
-create table operation_log;
-
-```
-
+### 部分截图
+![image](https://raw.githubusercontent.com/2bcoin/zheshiyigeniubidexiangmu/master/simg/1.png)
+![image](https://raw.githubusercontent.com/2bcoin/zheshiyigeniubidexiangmu/master/simg/2.png)
+![image](https://raw.githubusercontent.com/2bcoin/zheshiyigeniubidexiangmu/master/simg/3.png)
+![image](https://raw.githubusercontent.com/2bcoin/zheshiyigeniubidexiangmu/master/simg/4.png)
 
 ### 开发者建议
 - 表名，建议使用小写，多个单词使用下划线拼接
